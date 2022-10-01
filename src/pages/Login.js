@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import submitLogin from '../redux/actions';
+import { submitLogin } from '../redux/actions';
 
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -89,4 +89,5 @@ Login.propTypes = {
 const mapDispatchToProps = (dispatch) => ({
   submitLoginInfo: (state) => dispatch(submitLogin(state)),
 });
+
 export default connect(null, mapDispatchToProps)(Login);

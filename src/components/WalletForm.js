@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { requestApi } from '../redux/actions';
 import PropTypes from 'prop-types';
+import { requestApi } from '../redux/actions';
 
 class WalletForm extends Component {
   componentDidMount() {
