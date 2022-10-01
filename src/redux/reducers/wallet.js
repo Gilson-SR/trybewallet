@@ -1,5 +1,8 @@
 import {
-  IS_FETCHING,
+  REMOVE_EXPENSE,
+  ADD_EXPENSE,
+  EDIT_EXPENSE,
+  SUBMIT_EDIT,
   REQUEST_FAILURE,
   REQUEST_SUCCESS,
 } from '../actions/actionTypes';
@@ -14,16 +17,9 @@ const INITIAL_STATE = {
 
 function wallet(state = INITIAL_STATE, { type, payload }) {
   switch (type) {
-  case IS_FETCHING:
-    return {
-      ...state,
-      loading: true,
-    };
   case REQUEST_FAILURE:
     return {
-      ...state,
-      error: payload.error,
-      loading: false,
+      ...state, error: payload.error, loading: false,
     };
   case REQUEST_SUCCESS:
     return {
@@ -32,6 +28,40 @@ function wallet(state = INITIAL_STATE, { type, payload }) {
         .map(([currency]) => currency)
         .filter((currency) => currency !== 'USDT'),
       loading: false,
+    };
+  case REMOVE_EXPENSE:
+    return {
+      ...state,
+      expenses: state.expenses.filter((expense) => expense.id !== payload.id),
+    };
+  case ADD_EXPENSE:
+    return {
+      ...state, expenses: [...state.expenses, payload],
+    };
+  case EDIT_EXPENSE:
+    return {
+      ...state,
+      idToEdit: payload,
+      isEditing: true,
+    };
+  case SUBMIT_EDIT:
+    return {
+      ...state,
+      expenses: [...state.expenses.map((expense) => {
+        if (expense.id === payload.id) {
+          return {
+            ...expense,
+            value: payload.value,
+            description: payload.description,
+            tag: payload.tag,
+            currency: payload.currency,
+            method: payload.method,
+          };
+        }
+        return expense;
+      })],
+      isEditing: false,
+      idToEdit: '',
     };
   default:
     return state;
