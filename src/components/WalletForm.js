@@ -1,13 +1,38 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { requestApi } from '../redux/actions';
+import { requestApi, addExpense, submitEdit } from '../redux/actions';
+import apiCurrency from '../helpers/apiCurrencies';
+
+const INITIAL_STATE = {
+  valueInput: '',
+  currencyInput: 'USD',
+  methodInput: 'Dinheiro',
+  tagInput: 'Alimentação',
+  descriptionInput: '',
+};
 
 class WalletForm extends Component {
+  state = INITIAL_STATE;
+
   componentDidMount() {
     const { requestApiOfCurrencies } = this.props;
     requestApiOfCurrencies();
   }
+
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    this.setState({
+      [name]: value,
+    });
+  };
+
+  submitEdit = (event, expense) => {
+    event.preventDefault();
+    const { submitWalletEditForm, idToEdit} = this.props;
+    submitWalletEditForm({ ...expense, id: idToEdit });
+    this.setState(INITIAL_STATE);
+  };
 
   render() {
     const { currencies } = this.props;
