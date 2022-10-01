@@ -21,4 +21,12 @@ Header.propTypes = {
   expenses: PropTypes.arrayOf(PropTypes.shape({ amount: PropTypes.string })),
 }.isRequired;
 
+const mapStateToProps = (state) => {
+  const { user, wallet } = state;
+  return {
+    email: user.email,
+    expenses: wallet.expenses,
+  };
+};
+
 export default connect(mapStateToProps)(Header);
