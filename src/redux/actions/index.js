@@ -1,8 +1,11 @@
 import {
   SUBMIT_LOGIN,
-  IS_FETCHING,
   REQUEST_SUCCESS,
   REQUEST_FAILURE,
+  ADD_EXPENSE,
+  REMOVE_EXPENSE,
+  EDIT_EXPENSE,
+  SUBMIT_EDIT,
 } from './actionTypes';
 
 // Actions
