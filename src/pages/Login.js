@@ -80,9 +80,9 @@ class Login extends React.Component {
 }
 
 Login.propTypes = {
-  submitLoginInfo: func,
-  history: shape({
-    push: func,
+  submitLoginInfo: PropTypes.func,
+  history: PropTypes.shape({
+    push: PropTypes.func,
   }),
 }.isRequired;
 
