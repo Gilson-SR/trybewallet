@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { requestApi, addExpense, submitEdit } from '../redux/actions';
+import { requestApi, addExpense, submitEditExpense } from '../redux/actions';
 import apiCurrency from '../helpers/apiCurrencies';
 
 const INITIAL_STATE = {
@@ -29,7 +29,7 @@ class WalletForm extends Component {
 
   submitEdit = (event, expense) => {
     event.preventDefault();
-    const { submitWalletEditForm, idToEdit} = this.props;
+    const { submitWalletEditForm, idToEdit } = this.props;
     submitWalletEditForm({ ...expense, id: idToEdit });
     this.setState(INITIAL_STATE);
   };
