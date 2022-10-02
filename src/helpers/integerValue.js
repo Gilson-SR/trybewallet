@@ -1,7 +1,7 @@
 const integerValue = (value) => {
   const currencyStructure = {
-    minDecimalDigits: 2,
-    type: 'currency',
+    minimumFractionDigits: 2,
+    style: 'currency',
     currency: 'BRL',
   };
 

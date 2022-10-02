@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { requestApi, addExpense, submitEditExpense } from '../redux/actions';
+import { requestApi, addExpense, editExpense } from '../redux/actions';
 import apiCurrency from '../helpers/apiCurrencies';
 
 const INITIAL_STATE = {
@@ -194,7 +194,7 @@ const mapStateToProps = ({ wallet }) => ({
 const mapDispatchToProps = (dispatch) => ({
   requestApiOfCurrencies: () => dispatch(requestApi()),
   submitWalletForm: (state) => dispatch(addExpense(state)),
-  submitWalletEditForm: (state) => dispatch(submitEditExpense(state)),
+  submitWalletEditForm: (state) => dispatch(editExpense(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);
