@@ -34,8 +34,46 @@ class WalletForm extends Component {
     this.setState(INITIAL_STATE);
   };
 
+  submitForm = async (event) => {
+    event.preventDefault();
+    const { submitWalletForm, expensesLength } = this.props;
+    const {
+      valueInput: value,
+      currencyInput: currency,
+      methodInput: method,
+      tagInput: tag,
+      descriptionInput: description,
+    } = this.state;
+    const exchangeRates = await apiCurrency();
+    const expense = {
+      value,
+      currency,
+      method,
+      tag,
+      description,
+      exchangeRates,
+    };
+    submitWalletForm({ id: expensesLength, ...expense });
+    this.setState(INITIAL_STATE);
+  };
+
   render() {
-    const { currencies } = this.props;
+    const { handleChange, submitForm, props, state, submitEdit } = this;
+    const { currencies, isEditing } = props;
+    const {
+      valueInput,
+      currencyInput,
+      methodInput,
+      tagInput,
+      descriptionInput,
+    } = state;
+    const expense = {
+      value: valueInput,
+      currency: currencyInput,
+      method: methodInput,
+      tag: tagInput,
+      description: descriptionInput,
+    };
     return (
       <form>
         <label htmlFor="value-input">
@@ -43,8 +81,9 @@ class WalletForm extends Component {
           <input
             type="number"
             name="valueInput"
-            id="valueInput"
+            id={ valueInput }
             data-testid="value-input"
+            onChange={ handleChange }
           />
         </label>
         <label htmlFor="currency-input">
@@ -53,6 +92,8 @@ class WalletForm extends Component {
             name="currencyInput"
             id="currency-input"
             data-testid="currency-input"
+            value={ currencyInput }
+            onChange={ handleChange }
           >
             { currencies.map((currency) => (
               <option
@@ -81,6 +122,8 @@ class WalletForm extends Component {
           <select
             name="tagInput"
             id="tag-input"
+            value={ tagInput }
+            onChange={ handleChange }
             data-testid="tag-input"
           >
             <option value="food">Alimentação</option>
@@ -96,25 +139,62 @@ class WalletForm extends Component {
             type="text"
             name="descriptionInput"
             id="description-input"
+            value={ descriptionInput }
+            onChange={ handleChange }
             data-testid="description-input"
           />
         </label>
+        {isEditing ? (
+          <button type="submit" onClick={ (event) => submitEdit(event, expense) }>
+            Editar despesa
+          </button>
+        ) : (
+          <button type="submit" onClick={ submitForm }>
+            Adicionar despesa
+          </button>
+        )}
       </form>
     );
   }
 }
 
 WalletForm.propTypes = {
+  expenses: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      currency: PropTypes.string,
+      exchangeRates: PropTypes.shape({
+        USD: PropTypes.shape({
+          ask: PropTypes.string,
+          name: PropTypes.string,
+        }),
+      }),
+      description: PropTypes.string,
+      value: PropTypes.string,
+      tag: PropTypes.string,
+      method: PropTypes.string,
+    }),
+  ),
   currencies: PropTypes.arrayOf(PropTypes.string),
   requestApiOfCurrencies: PropTypes.func,
+  expensesLength: PropTypes.number,
+  submitWalletForm: PropTypes.func,
+  idToEdit: PropTypes.number,
+  isEditing: PropTypes.bool,
 }.isRequired;
 
 const mapStateToProps = ({ wallet }) => ({
   currencies: wallet.currencies,
+  expensesLength: wallet.expenses.length,
+  idToEdit: wallet.idToEdit,
+  expenses: wallet.expenses,
+  isEditing: wallet.isEditing,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   requestApiOfCurrencies: () => dispatch(requestApi()),
+  submitWalletForm: (state) => dispatch(addExpense(state)),
+  submitWalletEditForm: (state) => dispatch(submitEditExpense(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);
