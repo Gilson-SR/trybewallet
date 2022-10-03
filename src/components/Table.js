@@ -33,19 +33,20 @@ class Table extends Component {
               tag,
               method,
             } = expense;
+            console.log(tag);
             const valueExpense = Number(value);
             const valueCurrency = parseFloat(exchangeRates[currency].ask);
-            const valorConvertido = valueExpense * valueCurrency;
-            const nameCoin = exchangeRates[currency].name;
+            const exchangeValue = valueExpense * valueCurrency;
+            const currencyName = exchangeRates[currency].name;
             return (
               <tr key={ id }>
                 <td>{description}</td>
                 <td>{tag}</td>
                 <td>{method}</td>
                 <td>{integerValue(valueExpense)}</td>
-                <td>{nameCoin}</td>
+                <td>{currencyName}</td>
                 <td>{integerValue(valueCurrency)}</td>
-                <td>{integerValue(valorConvertido)}</td>
+                <td>{integerValue(exchangeValue)}</td>
                 <td>Real</td>
                 <td>
                   <button
