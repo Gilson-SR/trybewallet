@@ -8,6 +8,8 @@ import {
   SUBMIT_EDIT,
 } from './actionTypes';
 
+import requestApiCurrency from '../../helpers/apiCurrencies';
+
 // Actions
 
 export const requestFailure = (error) => ({

@@ -17,6 +17,7 @@ class WalletForm extends Component {
 
   componentDidMount() {
     const { requestApiOfCurrencies } = this.props;
+    console.log(this.props);
     requestApiOfCurrencies();
   }
 

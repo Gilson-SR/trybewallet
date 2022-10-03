@@ -33,7 +33,6 @@ class Table extends Component {
               tag,
               method,
             } = expense;
-            console.log(tag);
             const valueExpense = Number(value);
             const valueCurrency = parseFloat(exchangeRates[currency].ask);
             const exchangeValue = valueExpense * valueCurrency;

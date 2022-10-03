@@ -1,119 +1,115 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react-dom/test-utils';
 import { renderWithRouterAndRedux } from './helpers/renderWith';
 import App from '../App';
 
-describe('Criando cobertura de testes 60% da aplicação', () => {
-  it('Verificado se renderiza a tela de login com os inputs and button entrar', () => {
+const EMAIL_TEST_ID = 'email-input';
+const PASSWORD_TEST_ID = 'password-input';
+const EMAIL_VALIDO = 'maria@email.com';
+const PASSWORD_VALIDO = '123456';
+const TOTAL_FIELD = 'total-field';
+const EMAIL_FIELD = 'email-field';
+const HEADER_CURRENCY_FIELD = 'header-currency-field';
+const DESCRIPTION_TEXT_LABEL = 'Descrição:';
+const VALUE_TEXT_LABEL = 'Valor:';
+
+describe('Testes Page Login', () => {
+  test('Verifica se existe um form de Login', () => {
     const { history } = renderWithRouterAndRedux(<App />);
+    const { pathname } = history.location;
+    expect(pathname).toBe('/');
 
-    const emailCorrect = 'test@test.com';
-    const passwordCorrect = '123456';
+    const inputEmail = screen.getByTestId(EMAIL_TEST_ID);
+    const inputPassword = screen.getByTestId(PASSWORD_TEST_ID);
+    const btnSubmit = screen.getByRole('button', { name: 'Entrar' });
 
-    const buttonEntrar = screen.getByRole('button', { name: /entrar/i });
-    const inputPassword = screen.getByTestId('password-input');
-    const inputEmail = screen.getByTestId('email-input');
-
-    expect(buttonEntrar).toBeInTheDocument();
     expect(inputEmail).toBeInTheDocument();
     expect(inputPassword).toBeInTheDocument();
+    expect(btnSubmit).toBeInTheDocument();
+    expect(btnSubmit).toBeDisabled();
+  });
 
-    userEvent.type(inputEmail, emailCorrect);
-    userEvent.type(inputPassword, passwordCorrect);
-    userEvent.click(buttonEntrar);
+  test('Verifica se passado um email e senha valida o botão fica hablitado', () => {
+    const { history } = renderWithRouterAndRedux(<App />);
 
-    const { location: { pathname } } = history;
+    const inputEmail = screen.getByTestId(EMAIL_TEST_ID);
+    act(() => {
+      userEvent.type(inputEmail, EMAIL_VALIDO);
+    });
+    expect(inputEmail.value).toBe(EMAIL_VALIDO);
+
+    const inputPassword = screen.getByTestId(PASSWORD_TEST_ID);
+    act(() => {
+      userEvent.type(inputPassword, PASSWORD_VALIDO);
+    });
+    expect(inputPassword.value).toBe(PASSWORD_VALIDO);
+
+    const btnSubmit = screen.getByRole('button', { name: 'Entrar' });
+    expect(btnSubmit).not.toBeDisabled();
+    act(() => {
+    });
+    userEvent.click(btnSubmit);
+    const { pathname } = history.location;
     expect(pathname).toBe('/carteira');
   });
 });
 
-describe('Testando pagina wallet', () => {
-  it('teste pagina wallet and button ', () => {
-    const { history } = renderWithRouterAndRedux(<App />, { initialEntries: ['/carteira'] });
+describe('Testando page Wallet', () => {
+  test('Testando Header', () => {
+    renderWithRouterAndRedux(<App />, { initialEntries: ['/carteira'], initialState: { user: { email: EMAIL_VALIDO } } });
 
-    const { location: { pathname } } = history;
+    const emailUsed = screen.getByTestId(EMAIL_FIELD);
+    const valueTotal = screen.getByTestId(TOTAL_FIELD);
+    const currencyCoin = screen.getByTestId(HEADER_CURRENCY_FIELD);
 
-    expect(pathname).toBe('/carteira');
-
-    // verificando header
-    const emailUser = screen.getByTestId('email-field');
-    const valueExpense = screen.getByTestId('total-field');
-    const currency = screen.getByTestId('header-currency-field');
-    const valueExpenseInput = screen.getByTestId('value-input');
-    const inputDescription = screen.getByTestId('description-input');
-    const inputAdd = screen.getByRole('button', {
-      name: /adicionar despesa/i,
-    });
-
-    expect(emailUser).toBeInTheDocument();
-    expect(valueExpense).toBeInTheDocument();
-    expect(currency).toBeInTheDocument();
-    expect(valueExpenseInput).toBeInTheDocument();
-    expect(inputDescription).toBeInTheDocument();
-    expect(inputAdd).toBeInTheDocument();
+    expect(emailUsed.innerHTML).toBe(EMAIL_VALIDO);
+    expect(valueTotal.innerHTML).toBe('0.00');
+    expect(currencyCoin.innerHTML).toBe('BRL');
   });
 
-  it('Testando adicionar nova despesa', async () => {
-    const { history } = renderWithRouterAndRedux(<App />, { initialEntries: ['/carteira'] });
+  test('Testando Wallet Form e adição e remoção da despesa', async () => {
+    renderWithRouterAndRedux(<App />, { initialEntries: ['/carteira'], initialState: { user: { email: EMAIL_VALIDO } } });
 
-    const { location: { pathname } } = history;
+    const inputValue = screen.getByLabelText(VALUE_TEXT_LABEL);
+    expect(inputValue).toBeInTheDocument();
+    userEvent.type(inputValue, '10');
 
-    expect(pathname).toBe('/carteira');
+    const descriptionInput = screen.getByLabelText(DESCRIPTION_TEXT_LABEL);
+    expect(descriptionInput).toBeInTheDocument();
+    userEvent.type(descriptionInput, 'Pizza');
 
-    const valueExpenseInput = screen.getByTestId('value-input');
-    const inputDescription = screen.getByTestId('description-input');
-    const inputAdd = screen.getByRole('button', {
-      name: /adicionar despesa/i,
-    });
+    const btnAdd = screen.getByRole('button', { name: /adicionar despesa/i });
+    expect(btnAdd).toBeInTheDocument();
+    userEvent.click(btnAdd);
 
-    expect(inputAdd).toBeInTheDocument();
+    const btnRemover = await screen.findByRole('button', { name: /remover/i });
+    const btnEditar = await screen.findByRole('button', { name: /editar/i });
 
-    userEvent.type(valueExpenseInput, '20');
-    userEvent.type(inputDescription, 'Comprei Garrafa');
-    userEvent.click(inputAdd);
+    const tableCellValue = await screen.findByRole('cell', { name: '10.00' });
+    const tableCellDescription = await screen.findByRole('cell', { name: 'Pizza' });
 
-    const btnExcluir = await screen.findByTestId('delete-btn');
-    const data = await screen.findByRole('cell', {
-      name: /alimentação/i,
-    });
+    expect(tableCellDescription).toBeInTheDocument();
+    expect(tableCellValue).toBeInTheDocument();
+    expect(btnEditar).toBeInTheDocument();
+    expect(btnRemover).toBeInTheDocument();
 
-    expect(btnExcluir).toBeInTheDocument();
-    expect(data).toBeInTheDocument();
+    userEvent.click(btnEditar);
+    userEvent.type(inputValue, '20');
+    userEvent.type(descriptionInput, 'Sanduiche');
+    const submitEditingExpense = screen.getByRole('button', { name: /editar despesa/i });
+    userEvent.click(submitEditingExpense);
 
-    userEvent.click(btnExcluir);
-  });
-  it('Criando teste para 90/100%', async () => {
-    renderWithRouterAndRedux(<App />, { initialEntries: ['/carteira'] });
+    const tableCellValueEdited = await screen.findByRole('cell', { name: '20.00' });
+    const tableCellDescriptionEdited = await screen.findByRole('cell', { name: 'Sanduiche' });
 
-    const valueExpenseInput = screen.getByText(/valor da despesa:/i);
-    const inputDescription = screen.getByText(/descrição:/i);
-    const inputAdd = screen.getByRole('button', {
-      name: /adicionar despesa/i,
-    });
+    expect(tableCellDescriptionEdited).toBeInTheDocument();
+    expect(tableCellValueEdited).toBeInTheDocument();
 
-    userEvent.type(valueExpenseInput, '20');
-    userEvent.type(inputDescription, 'Comprei Ga');
-    userEvent.click(inputAdd);
+    userEvent.click(btnRemover);
 
-    const editButton = await screen.findByRole('button', {
-      name: /editar/i,
-    });
-
-    userEvent.click(editButton);
-
-    const btnEdit = await screen.findByRole('button', {
-      name: /editar despesas/i,
-    });
-
-    expect(btnEdit).toBeInTheDocument();
-
-    userEvent.type(valueExpenseInput, '10');
-    userEvent.type(inputDescription, 'Comprei Garrafa');
-    userEvent.click(btnEdit);
-
-    const total = await screen.findByText(/despesa total:/i);
-
-    expect(total).toBeInTheDocument();
+    expect(tableCellDescriptionEdited).not.toBeInTheDocument();
+    expect(tableCellValueEdited).not.toBeInTheDocument();
   });
 });
