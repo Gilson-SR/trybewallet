@@ -50,7 +50,7 @@ class Table extends Component {
                 <td>
                   <button
                     type="button"
-                    onClick={ () => toEditExpense(id) }
+                    onClick={ () => console.log(toEditExpense(id)) }
                     data-testid="edit-btn"
                   >
                     Editar

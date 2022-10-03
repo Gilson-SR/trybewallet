@@ -2,9 +2,10 @@ import {
   REMOVE_EXPENSE,
   ADD_EXPENSE,
   EDIT_EXPENSE,
-  SUBMIT_EDIT,
+  SUBMIT_EXPENSE_EDITED,
   REQUEST_FAILURE,
   REQUEST_SUCCESS,
+  IS_FETCHING,
 } from '../actions/actionTypes';
 // Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
 const INITIAL_STATE = {
@@ -17,10 +18,10 @@ const INITIAL_STATE = {
 
 function wallet(state = INITIAL_STATE, { type, payload }) {
   switch (type) {
+  case IS_FETCHING:
+    return { ...state, loading: true };
   case REQUEST_FAILURE:
-    return {
-      ...state, error: payload.error, loading: false,
-    };
+    return { ...state, error: payload.error, loading: false };
   case REQUEST_SUCCESS:
     return {
       ...state,
@@ -44,7 +45,7 @@ function wallet(state = INITIAL_STATE, { type, payload }) {
       idToEdit: payload,
       isEditing: true,
     };
-  case SUBMIT_EDIT:
+  case SUBMIT_EXPENSE_EDITED:
     return {
       ...state,
       expenses: [...state.expenses.map((expense) => {
